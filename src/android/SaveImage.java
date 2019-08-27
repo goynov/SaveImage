@@ -80,7 +80,7 @@ public class SaveImage extends CordovaPlugin {
         File srcFile = new File(filePath);
 
         // destination gallery folder - external storage
-        File dstGalleryFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File dstGalleryFolder = Environment.getExternalStoragePublicDirectory(filePath.endsWith(".webm") ? Environment.DIRECTORY_MOVIES : Environment.DIRECTORY_PICTURES);
 
         Log.d("SaveImage", "SaveImage dstGalleryFolder: " + dstGalleryFolder);
 
@@ -114,7 +114,12 @@ public class SaveImage extends CordovaPlugin {
 
         // Generate image file name using current date and time
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
-        File newFile = new File(dstFolder.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+        File newFile;
+        if (srcFile.getName().endsWith(".webm")){
+            newFile = new File(dstFolder.getPath() + File.separator + "MAGIC_BOOKS_READER_AR_" + timeStamp + ".webm");
+        }else {
+             newFile = new File(dstFolder.getPath() + File.separator + "MAGIC_BOOKS_READER_AR_" + timeStamp + ".jpg");
+        }
 
         // Read and write image files
         FileChannel inChannel = null;
