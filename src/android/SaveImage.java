@@ -59,6 +59,7 @@ public class SaveImage extends CordovaPlugin {
     	this.orientation = args.getString(1);
     	this.callbackContext = callback;
         Log.d("SaveImage", "SaveImage in filePath: " + filePath);
+        Log.d("SaveImage", "SaveImage orientation: " + orientation);
         
         if (filePath == null || filePath.equals("")) {
         	callback.error("Missing filePath");
@@ -89,9 +90,17 @@ public class SaveImage extends CordovaPlugin {
 
         try {
             if (!filePath.endsWith(".webm") && this.orientation != "0"){
+                String oValue = "";
+                switch(orientation) {
+                    case "90": oValue = String.valueOf(ExifInterface.ORIENTATION_ROTATE_90); break;
+                    case "180": oValue = String.valueOf(ExifInterface.ORIENTATION_ROTATE_180); break;
+                    case "270": oValue = String.valueOf(ExifInterface.ORIENTATION_ROTATE_270); break;
+                }
+                Log.d("SaveImage", "Setting EXIF" + oValue);
                 ExifInterface eif = new ExifInterface(srcFile.getPath());
-                eif.setAttribute(ExifInterface.TAG_ORIENTATION, this.orientation);
+                eif.setAttribute(ExifInterface.TAG_ORIENTATION, oValue);
                 eif.saveAttributes();
+                Log.d("SaveImage", "Setting EXIF Done.");
             }
 
             // Create export file in destination folder (gallery)
