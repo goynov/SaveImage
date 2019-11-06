@@ -19,6 +19,7 @@ import org.json.JSONException;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class SaveImage extends CordovaPlugin {
     private final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private CallbackContext callbackContext;
     private String filePath;
+    private String orientation;
     
 
     @Override
@@ -54,6 +56,7 @@ public class SaveImage extends CordovaPlugin {
      */  
     private void saveImageToGallery(JSONArray args, CallbackContext callback) throws JSONException {
     	this.filePath = args.getString(0);
+    	this.orientation = args.getString(1);
     	this.callbackContext = callback;
         Log.d("SaveImage", "SaveImage in filePath: " + filePath);
         
@@ -85,6 +88,12 @@ public class SaveImage extends CordovaPlugin {
         Log.d("SaveImage", "SaveImage dstGalleryFolder: " + dstGalleryFolder);
 
         try {
+            if (!filePath.endsWith(".webm") && this.orientation != "0"){
+                ExifInterface eif = new ExifInterface(srcFile.getPath());
+                eif.setAttribute(ExifInterface.TAG_ORIENTATION, this.orientation);
+                eif.saveAttributes();
+            }
+
             // Create export file in destination folder (gallery)
             File expFile = copyFile(srcFile, dstGalleryFolder);
 
@@ -94,6 +103,8 @@ public class SaveImage extends CordovaPlugin {
             callbackContext.success(expFile.toString());
         } catch (RuntimeException e) {
             callbackContext.error("RuntimeException occurred: " + e.getMessage());
+        } catch (Exception e ){
+            callbackContext.error("EXIF Exception occurred: " + e.getMessage());
         }
     }
 
