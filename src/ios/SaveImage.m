@@ -9,23 +9,20 @@
 	    self.callbackId = command.callbackId;
 
 		NSString *imgAbsolutePath = [command.arguments objectAtIndex:0];
-        NSString *orientation = [command.arguments objectAtIndex:1];
+        NSNumber *orientation = [command.arguments objectAtIndex:1];
 
         NSLog(@"Image absolute path: %@", imgAbsolutePath);
         
-        UIImage *image = [UIImage imageWithContentsOfFile:imgAbsolutePath];
-        if (![orientation  isEqual: @"0"]){
-            UIImageOrientation io;
-            if([orientation  isEqual: @"90"]){
-                io = UIImageOrientationRight;
-               }else if([orientation  isEqual: @"180"]){
-                io = UIImageOrientationDown;
-            }else {
-                io = UIImageOrientationLeft;
-            }
-            UIImage *i2 = [[UIImage alloc] initWithCGImage:image.CGImage scale:1.0 orientation:io];
-            image = i2;
+        UIImage *i0 = [UIImage imageWithContentsOfFile:imgAbsolutePath];
+        
+        UIImageOrientation io;
+        switch(orientation.intValue){
+            case 90: io = UIImageOrientationRight; break;
+            case 180: io = UIImageOrientationDown; break;
+            case 270: io = UIImageOrientationLeft; break;
+            default: io = UIImageOrientationUp;
         }
+        UIImage *image = [[UIImage alloc] initWithCGImage:i0.CGImage scale:1.0 orientation:io];
         UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
 	}];
 }
